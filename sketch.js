@@ -24,6 +24,7 @@ var bgn,bgn_img;
 var war,prince_Attack;
 var thorn_img;
 var nightball,nightball_img;
+var ghost,ghost_img;
 
 function preload(){
  bg_img = loadImage("background.jpg");
@@ -39,8 +40,10 @@ function preload(){
  prince_Attack = loadAnimation("k-1.png","k-2.png","k-3.png","k-4.png","k-5.png","k-6.png");
  level3_img = loadImage("level-3.png");
  bg4_img = loadImage("bg4.png");
+ bgn_img = loadImage("bg4night.jpg");
  level4_img = loadImage("level-4.png");
  nightball_img = loadAnimation("b-1.png","b-2.png","b-3.png","b-4.png","b-5.png");
+ ghost_img = loadImage("g.png");
 }
 
 function setup(){
@@ -64,6 +67,11 @@ function setup(){
     bg4.addImage("img",bg4_img);
     bg4.scale = 1.0;
     bg4.velocityX=-2;
+
+    bgn = createSprite(800,300,100,50);
+    bgn.addImage("img",bgn_img);
+    bgn.scale = 1.0;
+    bgn.velocityX=-2;
 
     prince = createSprite(100,650,50,50);
     prince.addAnimation("img",prince_img);
@@ -125,13 +133,14 @@ function setup(){
     level4 = createSprite(800,150,50,50);
     level4.addImage("img",level4_img);
 
-    nightball = createSprite(1200,650,50,50);
-    nightball.addAnimation("img",nightball_img);
-    nightball.velocityX=
+    ghost = createSprite(1300,400,50,50);
+    ghost.addImage("img",ghost_img);
+    ghost.velocityX=-5;
 
     ThornGroup = new Group();
     CoinGroup = new Group();
     KingGroup = new Group();
+    NightGroup = new Group();
 }
 
 function draw(){
@@ -148,6 +157,10 @@ function draw(){
     }
     if(bg4.x<700){
         bg4.x = 800;
+    }
+
+    if(bgn.x<700){
+        bgn.x = 800;
     }
 
     if(keyDown("space")){
@@ -190,18 +203,25 @@ function draw(){
         bg2.visible = false;
         level2.visible = false;
         bg3.visible = false;
+        bgn.visible = false;
+        ghost.visible = false;
         bg4.visible = false;
+       // nightball.visible = false;
         level3.visible = false;
         level4.visible = false;
         war.visible = false;
+        
     }
     if(coinScore ===1){
         bg2.visible = false;
         level2.visible = false;
         bg4.visible = false;
         bg3.visible = false;
+        bgn.visible = false;
         level4.visible = false;
         level3.visible = false;
+        ghost.visible = false;
+       // nightball.visible = false;
         war.visible = false;
     }
 
@@ -215,9 +235,12 @@ function draw(){
         bg2.visible = true;
         bg3.visible = false;
         bg4.visible = false;
+       // nightball.visible = false;
         level3.visible = false;
+        ghost.visible = false;
         level4.visible = false;
         war.visible = false;
+        bgn.visible = false;
         level1.destroy();
         level2.visible = true; 
         spawnThorns();
@@ -231,7 +254,10 @@ function draw(){
         level3.visible = false;
         level4.visible = false;
         bg4.visible = false;
+        bgn.visible = false;
         war.visible = false;
+        ghost.visible = false;
+        //nightball.visible = false;
         level1.destroy();
         bg3.visible = false;
     }
@@ -247,6 +273,9 @@ function draw(){
         bg2.visible = false;
         bg4.visible = false;
         war.visible = false;
+        ghost.visible = false;
+        bgn.visible = false;
+       // nightball.visible = false;
         level4.visible = false;
         level2.destroy();
         kings();
@@ -267,13 +296,13 @@ function draw(){
         war.visible = true;
         
     }
-    if(KingGroup.isTouching(war)){
-        KingGroup.destroyEach();
-    }
+    
     if(prince.isTouching(KingGroup)){
         prince.velocityX=0;
     }
-    if(coinScore === 6){
+    if(KingGroup.isTouching(war)){
+        KingGroup.destroyEach();
+        bg4.visible = true;
         gameLevel = 4;
     }
 
@@ -281,12 +310,29 @@ function draw(){
         bg4.visible = true;
         bg3.visible = false;
         level3.destroy();
+        nightballs();
+        ghost.visible = false;
         bg2.visible = false;
+        bgn.visible = false;
         war.visible = false;
         level4.visible = true;
         level2.destroy();
-        KingGroup.destroy();
+          
     }
+    if(NightGroup.isTouching(prince)){
+        NightGroup.destroyEach();
+        bgn.visible = true;
+        bgn.depth = bg4.depth;
+        bgn.depth += 1;
+        gameLevel = 5;
+    } 
+    if(gameLevel === 5){
+       bg4.visible = false;
+       ghost.visible = true;
+        war.visible = false;
+    }
+    //console.log(bg4.depth);
+    //console.log(bgn.depth);
     drawSprites();
     textSize(30);
     fill("black");
@@ -321,7 +367,13 @@ function kings(){
     }
 }
 
-function war(){
-    
+function nightballs(){
+    if(frameCount % 200 === 0){
+    nightball = createSprite(1200,650,50,50);
+    nightball.addAnimation("img",nightball_img);
+    nightball.velocityX=-4;
+
+    NightGroup.add(nightball);
+    }
 }
 
